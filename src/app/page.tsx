@@ -7,14 +7,39 @@ import type { PerfilLocal } from "@/lib/perfilLocal";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Nenhuma fonte externa pode derrubar a página: o assistente e o motor
+ * funcionam só com o que o usuário informa. Falha de rede degrada o que
+ * depende dela, não o produto inteiro.
+ */
+async function tolerante<T>(promessa: Promise<T>, padrao: T): Promise<T> {
+  try {
+    return await promessa;
+  } catch {
+    return padrao;
+  }
+}
+
+const INDICADORES_PADRAO = {
+  cdiAnual: 0.1465,
+  selicAnual: 0.1475,
+  ipcaAnual: 0.0462,
+  atualizadoEm: "",
+};
+
 export default async function Home() {
-  // Banco Central como fonte primária; Neon é o fallback.
+  // Banco Central é a fonte primária dos indicadores; o Neon é o fallback.
   const [vivo, base, demosRaw, snapTesouro] = await Promise.all([
-    indicadoresAoVivo(),
-    indicadores(),
-    perfisDemo(),
-    tesouro(),
+    tolerante(indicadoresAoVivo(), {
+      ...INDICADORES_PADRAO,
+      fonte: "valor de referência",
+      aoVivo: false,
+    }),
+    tolerante(indicadores(), INDICADORES_PADRAO),
+    tolerante(perfisDemo(), []),
+    tolerante(tesouro(), null),
   ]);
+
   const hoje = new Date().toISOString().slice(0, 10);
   const mercado = vivo.aoVivo
     ? {
@@ -24,13 +49,23 @@ export default async function Home() {
         atualizadoEm: `${vivo.atualizadoEm.slice(0, 10)} — ${vivo.fonte}`,
         hoje,
       }
-    : { ...base, atualizadoEm: `${base.atualizadoEm} — referência`, hoje };
+    : {
+        cdiAnual: base.cdiAnual || INDICADORES_PADRAO.cdiAnual,
+        selicAnual: base.selicAnual || INDICADORES_PADRAO.selicAnual,
+        ipcaAnual: base.ipcaAnual || INDICADORES_PADRAO.ipcaAnual,
+        atualizadoEm: base.atualizadoEm
+          ? `${base.atualizadoEm} — referência`
+          : "valor de referência",
+        hoje,
+      };
+
   const demos: PerfilDemoCliente[] = demosRaw.map((d) => ({
     slug: d.slug,
     nome: d.nome,
     descricao: d.descricao,
     payload: d.payload as PerfilLocal,
   }));
+
   const dadosCurva = snapTesouro
     ? {
         nominal: snapTesouro.curva.nominal,
