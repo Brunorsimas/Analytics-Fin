@@ -1,0 +1,29 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "jsx": "preserve",
+    "incremental": false,
+    "outDir": "../.selfcheck",
+    "rootDir": "..",
+    "types": ["node"],
+    "plugins": []
+  },
+  "include": [
+    "selfcheck.ts",
+    "smoke.ts",
+    "migrar.ts",
+    "selfcheck-chat.ts",
+    "selfcheck-ativos.ts",
+    "selfcheck-curva.ts",
+    "sync-tesouro.ts",
+    "../src/lib/**/*.ts"
+  ]
+}
+
+
+

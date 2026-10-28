@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f7f9;
+  --foreground: #14181f;
+  --card: #ffffff;
+  --muted: #5c6672;
+  --borda: #e2e6eb;
+  --positivo: #0f7a4d;
+  --negativo: #b3261e;
+  --atencao: #8a5300;
+  --acento: #1b4fd8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-borda: var(--borda);
+  --color-positivo: var(--positivo);
+  --color-negativo: var(--negativo);
+  --color-atencao: var(--atencao);
+  --color-acento: var(--acento);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d1117;
+    --foreground: #e8edf3;
+    --card: #161b22;
+    --muted: #9aa7b5;
+    --borda: #2a313a;
+    --positivo: #4ac98a;
+    --negativo: #ff7b72;
+    --atencao: #e3b341;
+    --acento: #6ea8ff;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Acessibilidade: foco sempre visível (escopo 5.5) */
+:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.pular-para-conteudo {
+  position: absolute;
+  left: -9999px;
+}
+.pular-para-conteudo:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 50;
+  padding: 0.5rem 1rem;
+  background: var(--card);
+  border: 2px solid var(--acento);
+  border-radius: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
